@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-recess-order",
+    "stylelint-config-prettier-scss"
+  ],
+  "rules": {
+    "block-no-empty": [true, { "ignore": ["comments"] }],
+    "selector-class-pattern": null,
+    "selector-id-pattern": null,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["global", "local"] }
+    ],
+    "color-function-notation": "legacy",
+    "no-descending-specificity": null,
+    "number-max-precision": null,
+    "value-no-vendor-prefix": null,
+    "property-no-vendor-prefix": null,
+    "alpha-value-notation": "number",
+    "scss/no-global-function-names": null,
+    "scss/at-rule-no-unknown": null,
+    "scss/double-slash-comment-empty-line-before": null,
+    "scss/selector-no-union-class-name": true,
+    "scss/declaration-nested-properties": "never"
+  }
+}
