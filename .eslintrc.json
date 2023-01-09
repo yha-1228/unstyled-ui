@@ -4,6 +4,11 @@
     "es2021": true,
     "node": true
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -20,7 +25,11 @@
   },
   "plugins": ["react", "@typescript-eslint", "import", "tailwindcss"],
   "rules": {
+    "dot-notation": "warn",
     "react/react-in-jsx-scope": "off",
+    "react/jsx-curly-brace-presence": "warn",
+    "react/jsx-boolean-value": "warn",
+    "react/self-closing-comp": "warn",
     "no-duplicate-imports": "warn",
     "tailwindcss/no-custom-classname": "off",
     "import/newline-after-import": ["warn", { "count": 1 }],
