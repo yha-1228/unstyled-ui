@@ -93,8 +93,6 @@ const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
 
   const { elements, ref: tabRef } = useElements<HTMLButtonElement>();
 
-  console.log('TabList render.');
-
   const actionTabChange = (index: number) => {
     setActiveIndex(index);
     if (onChange) onChange(index);
@@ -179,8 +177,6 @@ const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
     const { children } = props;
 
     const { id, activeIndex } = useTabsContext();
-
-    console.log('PanelList render.');
 
     if (activeIndex === undefined) return null;
 
