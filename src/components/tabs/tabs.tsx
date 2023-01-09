@@ -76,7 +76,7 @@ Tab.displayName = 'Tab';
 // TabList
 // --------------------
 
-type TabListProps = React.ComponentPropsWithRef<'div'> & {
+type TabListProps = Omit<React.ComponentPropsWithRef<'div'>, 'children'> & {
   children: React.ReactElement[] | React.ReactElement;
 };
 
@@ -121,29 +121,24 @@ const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
       onKeyDown={handleKeyDown}
       ref={ref}
     >
-      {(Array.isArray(children) ? children : [children]).map(
-        (childrenItem, index) => {
-          const selected =
-            activeIndex === undefined ? false : index === activeIndex;
+      {React.Children.map(children, (children, index) => {
+        const selected =
+          activeIndex === undefined ? false : index === activeIndex;
 
-          return React.cloneElement<TabProps & InjectTabDataAttrs>(
-            childrenItem,
-            {
-              key: index,
-              ref: tabRef,
-              tabIndex: index === activeIndex ? 0 : -1,
-              onClick: () => {
-                selectFocus(elements, index);
-                actionTabChange(index);
-              },
-              'aria-selected': selected,
-              'aria-controls': generatePanelId(index, id),
-              id: generateTabId(index, id),
-              'data-state': selected ? 'active' : 'inactive',
-            }
-          );
-        }
-      )}
+        return React.cloneElement<TabProps & InjectTabDataAttrs>(children, {
+          key: index,
+          ref: tabRef,
+          tabIndex: index === activeIndex ? 0 : -1,
+          onClick: () => {
+            selectFocus(elements, index);
+            actionTabChange(index);
+          },
+          'aria-selected': selected,
+          'aria-controls': generatePanelId(index, id),
+          id: generateTabId(index, id),
+          'data-state': selected ? 'active' : 'inactive',
+        });
+      })}
     </div>
   );
 });
@@ -182,20 +177,18 @@ const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
 
     return (
       <div {...props} ref={ref}>
-        {(Array.isArray(children) ? children : [children]).map(
-          (childrenItem, index) => {
-            const selected = index === activeIndex;
+        {React.Children.map(children, (children, index) => {
+          const selected = index === activeIndex;
 
-            return (
-              selected &&
-              React.cloneElement<PanelProps>(childrenItem, {
-                key: index,
-                'aria-labelledby': generateTabId(index, id),
-                id: generatePanelId(index, id),
-              })
-            );
-          }
-        )}
+          return (
+            selected &&
+            React.cloneElement<PanelProps>(children, {
+              key: index,
+              'aria-labelledby': generateTabId(index, id),
+              id: generatePanelId(index, id),
+            })
+          );
+        })}
       </div>
     );
   }
