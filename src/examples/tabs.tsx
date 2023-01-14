@@ -36,10 +36,7 @@ export function TabsExample() {
     <div>
       <h1>Demo</h1>
 
-      <Tabs.Provider
-        defaultIndex={tabIndex}
-        onChange={(selectedIndex) => setTabIndex(selectedIndex)}
-      >
+      <Tabs.Provider defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>HTML</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>CSS</Tabs.Tab>
@@ -82,10 +79,7 @@ function JavaScriptDetail() {
     >
       JavaScript is not Java.
       <hr />
-      <Tabs.Provider
-        defaultIndex={tabIndex}
-        onChange={(selectedIndex) => setTabIndex(selectedIndex)}
-      >
+      <Tabs.Provider defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>React</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>Angular</Tabs.Tab>

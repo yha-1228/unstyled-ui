@@ -13,12 +13,14 @@ const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 // Provider
 // --------------------
 
-type ProviderProps = {
+type ProviderPropsAsContext = {
   defaultIndex?: number;
   defaultIsNotSelected?: boolean;
-  onChange?: (selectedIndex: number) => void;
-  children: React.ReactNode;
+  onTabChange?: (selectedIndex: number) => void;
 };
+
+type ProviderProps = React.ComponentPropsWithoutRef<'div'> &
+  ProviderPropsAsContext;
 
 type TabsState = {
   id: string;
@@ -26,36 +28,41 @@ type TabsState = {
   setActiveIndex: (index: number) => void;
 };
 
-type UseTabsContextReturn = TabsState & Omit<ProviderProps, 'children'>;
+type TabsContextValue = TabsState & ProviderPropsAsContext;
 
-const TabsContext = contextFactory<UseTabsContextReturn>();
+const TabsContext = contextFactory<TabsContextValue>();
 
 const useTabsContext = contextHookFactory(
   TabsContext,
   'useTabsContext must be inside <Tabs.Provider />'
 );
 
+const INITIAL_TAB_INDEX = 0;
+
 function Provider(props: ProviderProps) {
-  const { children, ...propsExcludeChildren } = props;
+  const { defaultIndex, defaultIsNotSelected, onTabChange, ...divProps } =
+    props;
 
   const id = useId();
 
   const [activeIndex, setActiveIndex] = useState(() => {
     if (props.defaultIsNotSelected) return undefined;
     if (props.defaultIndex) return props.defaultIndex;
-    return 0;
+    return INITIAL_TAB_INDEX;
   });
 
-  const tabsContextValue: UseTabsContextReturn = {
+  const tabsContextValue: TabsContextValue = {
     id,
     activeIndex,
     setActiveIndex,
-    ...propsExcludeChildren,
+    defaultIndex,
+    defaultIsNotSelected,
+    onTabChange,
   };
 
   return (
     <TabsContext.Provider value={tabsContextValue}>
-      <div>{children}</div>
+      <div {...divProps} />
     </TabsContext.Provider>
   );
 }
@@ -89,27 +96,26 @@ type InjectTabDataAttrs = {
 const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
   const { children, ...propsExcludeChildren } = props;
 
-  const { id, activeIndex, setActiveIndex, onChange } = useTabsContext();
+  const { id, activeIndex, setActiveIndex, onTabChange } = useTabsContext();
 
   const { elements, ref: tabRef } = useElements<HTMLButtonElement>();
 
-  const actionTabChange = (index: number) => {
-    setActiveIndex(index);
-    if (onChange) onChange(index);
+  const actionTabChange = (selectedIndex: number) => {
+    selectFocus(elements, selectedIndex);
+    setActiveIndex(selectedIndex);
+    onTabChange?.(selectedIndex);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight') {
       const nextIndex =
-        activeIndex === elements.length - 1 ? 0 : (activeIndex as number) + 1;
-      selectFocus(elements, nextIndex);
+        activeIndex === elements.length - 1 ? 0 : activeIndex! + 1;
       actionTabChange(nextIndex);
     }
 
     if (e.key === 'ArrowLeft') {
       const nextIndex =
-        activeIndex === 0 ? elements.length - 1 : (activeIndex as number) - 1;
-      selectFocus(elements, nextIndex);
+        activeIndex === 0 ? elements.length - 1 : activeIndex! - 1;
       actionTabChange(nextIndex);
     }
   };
@@ -129,10 +135,7 @@ const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
           key: index,
           ref: tabRef,
           tabIndex: index === activeIndex ? 0 : -1,
-          onClick: () => {
-            selectFocus(elements, index);
-            actionTabChange(index);
-          },
+          onClick: () => actionTabChange(index),
           'aria-selected': selected,
           'aria-controls': generatePanelId(index, id),
           id: generateTabId(index, id),
@@ -169,14 +172,14 @@ type PanelListRef = HTMLDivElement;
 
 const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
   (props, ref) => {
-    const { children } = props;
+    const { children, ...propsExcludeChildren } = props;
 
     const { id, activeIndex } = useTabsContext();
 
     if (activeIndex === undefined) return null;
 
     return (
-      <div {...props} ref={ref}>
+      <div {...propsExcludeChildren} ref={ref}>
         {React.Children.map(children, (children, index) => {
           const selected = index === activeIndex;
 
