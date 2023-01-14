@@ -1,7 +1,7 @@
 import React, { useId, useState } from 'react';
 import { useElements } from '../../hooks/use-elements';
 import { selectFocus } from '../../utils/dom';
-import { contextFactory, contextHookFactory } from '../../utils/react';
+import { createContext, createContextHook } from '../../utils/react';
 
 // Utils
 // --------------------
@@ -30,12 +30,12 @@ type TabsState = {
 
 type TabsContextValue = TabsState & ProviderPropsAsContext;
 
-const TabsContext = contextFactory<TabsContextValue>();
+const TabsContext = createContext<TabsContextValue>();
 
-const useTabsContext = contextHookFactory(
-  TabsContext,
-  'useTabsContext must be inside <Tabs.Provider />'
-);
+const useTabsContext = createContextHook(TabsContext, {
+  hookName: 'useTabsContext',
+  providerName: 'Tabs.Provider',
+});
 
 const INITIAL_TAB_INDEX = 0;
 
