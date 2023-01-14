@@ -26,6 +26,11 @@
   "plugins": ["react", "@typescript-eslint", "import", "tailwindcss"],
   "rules": {
     "dot-notation": "warn",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "ignoreRestSiblings": true }
+    ],
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-curly-brace-presence": "warn",
