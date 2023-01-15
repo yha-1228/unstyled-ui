@@ -9,10 +9,10 @@ const generateTabId = (index: number, id: string) => `tab-${index}-${id}`;
 
 const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 
-// Root
+// TabsRoot
 // --------------------
 
-type ProviderProps = {
+type TabsProviderProps = {
   defaultIndex?: number;
   defaultIsNotSelected?: boolean;
   onIndexChange?: (selectedIndex: number) => void;
@@ -24,7 +24,7 @@ type TabsState = {
   setActiveIndex: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
-type TabsContextValue = TabsState & ProviderProps;
+type TabsContextValue = TabsState & TabsProviderProps;
 
 const TabsContext = createContext<TabsContextValue>();
 
@@ -35,7 +35,9 @@ const useTabsContext = createContextHook(TabsContext, {
 
 const INITIAL_TAB_INDEX = 0;
 
-function Root(props: React.ComponentPropsWithoutRef<'div'> & ProviderProps) {
+type DivProps = React.ComponentPropsWithoutRef<'div'>;
+
+function TabsRoot(props: DivProps & TabsProviderProps) {
   const { defaultIndex, defaultIsNotSelected, onIndexChange, ...divProps } =
     props;
 
@@ -55,7 +57,7 @@ function Root(props: React.ComponentPropsWithoutRef<'div'> & ProviderProps) {
     // ---
     defaultIndex,
     defaultIsNotSelected,
-    onIndexChange: onIndexChange,
+    onIndexChange,
   };
 
   return (
@@ -201,7 +203,7 @@ PanelList.displayName = 'PanelList';
 // --------------------
 
 export const Tabs = {
-  Root,
+  Root: TabsRoot,
   TabList,
   Tab,
   PanelList,
