@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
 import { useLocalStorage } from 'react-use';
-import { Tabs } from '../components/tabs/tabs';
+import { Tabs } from '../components/tabs';
+import { SegmentedContorl } from '../components/tabs/segmented-contorl';
 
 const tabListStyle = css({
   display: 'flex',
@@ -24,7 +25,7 @@ const tabStyle = css({
   },
 });
 
-export function TabsExample() {
+export function Demo() {
   const [tabIndex, setTabIndex] = useLocalStorage(
     'unstyled/tabs/APP__TAB_INDEX',
     1
@@ -36,7 +37,7 @@ export function TabsExample() {
     <div>
       <h1>Demo</h1>
 
-      <Tabs defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs.Root defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>HTML</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>CSS</Tabs.Tab>
@@ -49,12 +50,32 @@ export function TabsExample() {
             <JavaScriptDetail />
           </Tabs.Panel>
         </Tabs.PanelList>
-      </Tabs>
+      </Tabs.Root>
 
       <div>
         <hr />
         current tabIndex: {tabIndex}
       </div>
+
+      <SegmentedContorl.Root>
+        <SegmentedContorl.SegmentList>
+          <SegmentedContorl.Segment
+            className={css({ '&[data-state="active"]': { color: 'blue' } })}
+          >
+            day
+          </SegmentedContorl.Segment>
+          <SegmentedContorl.Segment
+            className={css({ '&[data-state="active"]': { color: 'blue' } })}
+          >
+            week
+          </SegmentedContorl.Segment>
+          <SegmentedContorl.Segment
+            className={css({ '&[data-state="active"]': { color: 'blue' } })}
+          >
+            month
+          </SegmentedContorl.Segment>
+        </SegmentedContorl.SegmentList>
+      </SegmentedContorl.Root>
     </div>
   );
 }
@@ -79,7 +100,7 @@ function JavaScriptDetail() {
     >
       JavaScript is not Java.
       <hr />
-      <Tabs defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs.Root defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>React</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>Angular</Tabs.Tab>
@@ -90,7 +111,7 @@ function JavaScriptDetail() {
           <Tabs.Panel>made by google</Tabs.Panel>
           <Tabs.Panel>made by evan you</Tabs.Panel>
         </Tabs.PanelList>
-      </Tabs>
+      </Tabs.Root>
     </div>
   );
 }

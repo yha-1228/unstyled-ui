@@ -1,9 +1,9 @@
-import { TabsExample } from '../examples/tabs';
+import { Demo } from '../examples/demo';
 
 export function Home() {
   return (
     <div>
-      <TabsExample />
+      <Demo />
     </div>
   );
 }

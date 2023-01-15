@@ -200,9 +200,10 @@ PanelList.displayName = 'PanelList';
 // export
 // --------------------
 
-export const Tabs = Object.assign(Root, {
+export const Tabs = {
+  Root,
   TabList,
   Tab,
   PanelList,
   Panel,
-});
+};
