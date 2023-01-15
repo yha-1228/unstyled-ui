@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import { useElements } from '../../hooks/use-elements';
-import { createContext, createContextHook } from '../../utils/react';
+import { createContext } from '../../utils/react';
 
 // Utils
 // --------------------
@@ -26,11 +26,9 @@ type TabsState = {
 
 type TabsContextValue = TabsState & TabsProviderProps;
 
-const TabsContext = createContext<TabsContextValue>();
-
-const useTabsContext = createContextHook(TabsContext, {
+const [TabsContext, useTabsContext] = createContext<TabsContextValue>({
   hookName: 'useTabsContext',
-  providerName: 'Tabs',
+  providerName: 'Tabs.Root',
 });
 
 const INITIAL_TAB_INDEX = 0;

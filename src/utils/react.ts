@@ -16,19 +16,24 @@ export function forwardRefWithName<T, P = unknown>(
   return component;
 }
 
-export const createContext = <ContextValue>() =>
-  React.createContext<ContextValue | undefined>(undefined);
+/**
+ * Return `[context, context hook]`
+ */
+export const createContext = <ContextValue>(option?: {
+  defaultValue?: ContextValue;
+  hookName?: string;
+  providerName?: string;
+}) => {
+  const Context = React.createContext<ContextValue | undefined>(
+    option?.defaultValue
+  );
 
-export const createContextHook = <ContextValue>(
-  context: React.Context<ContextValue | undefined>,
-  debugOption?: { hookName?: string; providerName?: string }
-) => {
   function useContext(): ContextValue {
-    const ctx = React.useContext<ContextValue | undefined>(context);
+    const ctx = React.useContext<ContextValue | undefined>(Context);
     if (!ctx) {
-      const hook = debugOption?.hookName || 'This hook';
-      const provider = debugOption?.providerName
-        ? `<${debugOption?.providerName} />`
+      const hook = option?.hookName || 'This hook';
+      const provider = option?.providerName
+        ? `<${option?.providerName} />`
         : 'provider';
       const msg = `${hook} has to be used within ${provider}`;
       throw new Error(msg);
@@ -36,5 +41,5 @@ export const createContextHook = <ContextValue>(
     return ctx;
   }
 
-  return useContext;
+  return [Context, useContext] as const;
 };
