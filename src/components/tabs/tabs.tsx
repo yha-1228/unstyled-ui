@@ -201,10 +201,9 @@ PanelList.displayName = 'PanelList';
 // export
 // --------------------
 
-export const Tabs = {
-  Provider,
+export const Tabs = Object.assign(Provider, {
   TabList,
   Tab,
   PanelList,
   Panel,
-};
+});

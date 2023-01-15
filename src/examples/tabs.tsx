@@ -36,7 +36,7 @@ export function TabsExample() {
     <div>
       <h1>Demo</h1>
 
-      <Tabs.Provider defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>HTML</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>CSS</Tabs.Tab>
@@ -49,7 +49,7 @@ export function TabsExample() {
             <JavaScriptDetail />
           </Tabs.Panel>
         </Tabs.PanelList>
-      </Tabs.Provider>
+      </Tabs>
 
       <div>
         <hr />
@@ -79,7 +79,7 @@ function JavaScriptDetail() {
     >
       JavaScript is not Java.
       <hr />
-      <Tabs.Provider defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs defaultIndex={tabIndex} onTabChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>React</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>Angular</Tabs.Tab>
@@ -90,7 +90,7 @@ function JavaScriptDetail() {
           <Tabs.Panel>made by google</Tabs.Panel>
           <Tabs.Panel>made by evan you</Tabs.Panel>
         </Tabs.PanelList>
-      </Tabs.Provider>
+      </Tabs>
     </div>
   );
 }
