@@ -37,7 +37,7 @@ export function Demo() {
     <div>
       <h1>Demo</h1>
 
-      <Tabs.Root defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs.Root defaultIndex={tabIndex} onIndexChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>HTML</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>CSS</Tabs.Tab>
@@ -100,7 +100,7 @@ function JavaScriptDetail() {
     >
       JavaScript is not Java.
       <hr />
-      <Tabs.Root defaultIndex={tabIndex} onTabChange={setTabIndex}>
+      <Tabs.Root defaultIndex={tabIndex} onIndexChange={setTabIndex}>
         <Tabs.TabList className={tabListStyle}>
           <Tabs.Tab className={tabStyle}>React</Tabs.Tab>
           <Tabs.Tab className={tabStyle}>Angular</Tabs.Tab>

@@ -15,7 +15,7 @@ const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 type ProviderProps = {
   defaultIndex?: number;
   defaultIsNotSelected?: boolean;
-  onTabChange?: (selectedIndex: number) => void;
+  onIndexChange?: (selectedIndex: number) => void;
 };
 
 type TabsState = {
@@ -36,7 +36,7 @@ const useTabsContext = createContextHook(TabsContext, {
 const INITIAL_TAB_INDEX = 0;
 
 function Root(props: React.ComponentPropsWithoutRef<'div'> & ProviderProps) {
-  const { defaultIndex, defaultIsNotSelected, onTabChange, ...divProps } =
+  const { defaultIndex, defaultIsNotSelected, onIndexChange, ...divProps } =
     props;
 
   const id = useId();
@@ -55,7 +55,7 @@ function Root(props: React.ComponentPropsWithoutRef<'div'> & ProviderProps) {
     // ---
     defaultIndex,
     defaultIsNotSelected,
-    onTabChange,
+    onIndexChange: onIndexChange,
   };
 
   return (
@@ -94,14 +94,14 @@ type InjectTabDataAttrs = {
 const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
   const { children, ...propsExcludeChildren } = props;
 
-  const { id, activeIndex, setActiveIndex, onTabChange } = useTabsContext();
+  const { id, activeIndex, setActiveIndex, onIndexChange } = useTabsContext();
 
   const { elements, ref: tabRef } = useElements<HTMLButtonElement>();
 
   const actionTabChange = (selectedIndex: number) => {
     elements[selectedIndex].focus();
     setActiveIndex(selectedIndex);
-    onTabChange?.(selectedIndex);
+    onIndexChange?.(selectedIndex);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
