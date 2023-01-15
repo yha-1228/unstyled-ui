@@ -1,6 +1,5 @@
 import React, { useId, useState } from 'react';
 import { useElements } from '../../hooks/use-elements';
-import { selectFocus } from '../../utils/dom';
 import { createContext, createContextHook } from '../../utils/react';
 
 // Utils
@@ -101,22 +100,22 @@ const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
   const { elements, ref: tabRef } = useElements<HTMLButtonElement>();
 
   const actionTabChange = (selectedIndex: number) => {
-    selectFocus(elements, selectedIndex);
+    elements[selectedIndex].focus();
     setActiveIndex(selectedIndex);
     onTabChange?.(selectedIndex);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight') {
-      const nextIndex =
+      const nextActiveIndex =
         activeIndex === elements.length - 1 ? 0 : activeIndex! + 1;
-      actionTabChange(nextIndex);
+      actionTabChange(nextActiveIndex);
     }
 
     if (e.key === 'ArrowLeft') {
-      const nextIndex =
+      const nextActiveIndex =
         activeIndex === 0 ? elements.length - 1 : activeIndex! - 1;
-      actionTabChange(nextIndex);
+      actionTabChange(nextActiveIndex);
     }
   };
 
@@ -134,7 +133,7 @@ const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
         return React.cloneElement<TabProps & InjectTabDataAttrs>(children, {
           key: index,
           ref: tabRef,
-          tabIndex: index === activeIndex ? 0 : -1,
+          tabIndex: selected ? 0 : -1,
           onClick: () => actionTabChange(index),
           'aria-selected': selected,
           'aria-controls': generatePanelId(index, id),
