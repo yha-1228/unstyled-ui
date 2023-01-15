@@ -12,7 +12,7 @@ const Segment = React.forwardRef<
 >((props, ref) => {
   const { 'aria-controls': aria_controls, ...rest } = props;
 
-  return <Tabs.Tab aria-controls={aria_controls} {...rest} ref={ref} />;
+  return <Tabs.Tab {...rest} ref={ref} />;
 });
 
 Segment.displayName = 'Segment';
