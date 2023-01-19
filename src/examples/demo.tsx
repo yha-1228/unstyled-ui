@@ -31,8 +31,6 @@ export function Demo() {
     1
   );
 
-  console.log('render <App />');
-
   return (
     <div>
       <h1>Demo</h1>
@@ -87,8 +85,6 @@ function JavaScriptDetail() {
     'unstyled/tabs/JAVASCRIPT_DETAIL__TAB_INDEX',
     1
   );
-
-  console.log('render <JavaScriptDetail />');
 
   return (
     <div
