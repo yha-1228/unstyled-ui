@@ -1,4 +1,5 @@
 import React, { useId, useRef, useState } from 'react';
+import { useCallbackRef } from '../../hooks/use-callback-ref';
 import { createContext } from '../../utils/react';
 
 // Utils
@@ -87,10 +88,10 @@ const TabList: React.FC<TabListProps> = (props) => {
   const { children, ...propsExcludeChildren } = props;
   const lastTabElementIndex = React.Children.count(children) - 1;
 
-  const ref = useRef<HTMLDivElement>(null);
+  const [ref, tabElement] = useCallbackRef<HTMLDivElement>();
 
-  const firstTabElement = ref.current?.firstElementChild;
-  const lastTabElement = ref.current?.lastElementChild;
+  const firstTabElement = tabElement?.firstElementChild;
+  const lastTabElement = tabElement?.lastElementChild;
 
   return (
     <div role="tablist" {...propsExcludeChildren} ref={ref}>
