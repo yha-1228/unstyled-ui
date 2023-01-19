@@ -25,6 +25,7 @@
   },
   "plugins": ["react", "@typescript-eslint", "import", "tailwindcss"],
   "rules": {
+    "no-useless-rename": "warn",
     "dot-notation": "warn",
     "@typescript-eslint/no-non-null-assertion": "off",
     "no-unused-vars": "off",
