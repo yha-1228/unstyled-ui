@@ -1,5 +1,4 @@
-import React, { useId, useState } from 'react';
-import { useElements } from '../../hooks/use-elements';
+import React, { useId, useRef, useState } from 'react';
 import { createContext } from '../../utils/react';
 
 // Utils
@@ -65,19 +64,6 @@ function TabsRoot(props: DivProps & TabsProviderProps) {
   );
 }
 
-// Tab
-// --------------------
-
-type TabProps = React.ComponentPropsWithRef<'button'>;
-
-type TabRef = HTMLButtonElement;
-
-const Tab = React.forwardRef<TabRef, TabProps>((props, ref) => (
-  <button ref={ref} type="button" role="tab" {...props} />
-));
-
-Tab.displayName = 'Tab';
-
 // TabList
 // --------------------
 
@@ -85,79 +71,118 @@ type TabListProps = Omit<React.ComponentPropsWithRef<'div'>, 'children'> & {
   children: React.ReactElement[] | React.ReactElement;
 };
 
-type TabListRef = HTMLDivElement;
-
-type InjectTabDataAttrs = {
-  'data-state': 'active' | 'inactive';
+type TabContextValue = {
+  index: number;
+  lastIndex: number;
+  firstElement: HTMLButtonElement;
+  lastElement: HTMLButtonElement;
 };
 
-const TabList = React.forwardRef<TabListRef, TabListProps>((props, ref) => {
+const [TabContext, useTabContext] = createContext<TabContextValue>({
+  hookName: 'useTabContext',
+  providerName: 'Tabs.TabList',
+});
+
+const TabList: React.FC<TabListProps> = (props) => {
   const { children, ...propsExcludeChildren } = props;
+  const lastTabElementIndex = React.Children.count(children) - 1;
 
-  const { id, activeIndex, setActiveIndex, onIndexChange } = useTabsContext();
+  const ref = useRef<HTMLDivElement>(null);
 
-  const { elements, ref: tabRef } = useElements<HTMLButtonElement>();
+  const firstTabElement = ref.current?.firstElementChild;
+  const lastTabElement = ref.current?.lastElementChild;
+
+  return (
+    <div role="tablist" {...propsExcludeChildren} ref={ref}>
+      {React.Children.map(children, (children, index) => {
+        return (
+          <TabContext.Provider
+            key={index}
+            value={{
+              index,
+              lastIndex: lastTabElementIndex,
+              firstElement: firstTabElement as HTMLButtonElement,
+              lastElement: lastTabElement as HTMLButtonElement,
+            }}
+          >
+            {children}
+          </TabContext.Provider>
+        );
+      })}
+    </div>
+  );
+};
+
+TabList.displayName = 'TabList';
+
+// Tab
+// --------------------
+
+type TabProps = React.ComponentPropsWithRef<'button'>;
+
+const Tab: React.FC<TabProps> = (props) => {
+  const { activeIndex, setActiveIndex, onIndexChange, id } = useTabsContext();
+
+  const { index, lastIndex, firstElement, lastElement } = useTabContext();
+
+  const ref = useRef<HTMLButtonElement>(null);
+
+  const selected = activeIndex === undefined ? false : index === activeIndex;
 
   const actionTabChange = (selectedIndex: number) => {
-    elements[selectedIndex].focus();
     setActiveIndex(selectedIndex);
     onIndexChange?.(selectedIndex);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleClick = () => {
+    ref.current?.focus();
+    actionTabChange(index);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === 'ArrowRight') {
-      const nextActiveIndex =
-        activeIndex === elements.length - 1 ? 0 : activeIndex! + 1;
-      actionTabChange(nextActiveIndex);
+      const nextTabElement = ref.current?.nextElementSibling;
+
+      if (nextTabElement instanceof HTMLButtonElement) {
+        nextTabElement.focus();
+        actionTabChange(index + 1);
+      } else {
+        firstElement.focus();
+        actionTabChange(0);
+      }
     }
 
     if (e.key === 'ArrowLeft') {
-      const nextActiveIndex =
-        activeIndex === 0 ? elements.length - 1 : activeIndex! - 1;
-      actionTabChange(nextActiveIndex);
+      const prevTabElement = ref.current?.previousElementSibling;
+
+      if (prevTabElement instanceof HTMLButtonElement) {
+        prevTabElement.focus();
+        actionTabChange(index - 1);
+      } else {
+        lastElement.focus();
+        actionTabChange(lastIndex);
+      }
     }
   };
 
   return (
-    <div
-      role="tablist"
-      {...propsExcludeChildren}
-      onKeyDown={handleKeyDown}
+    <button
       ref={ref}
-    >
-      {React.Children.map(children, (children, index) => {
-        const selected =
-          activeIndex === undefined ? false : index === activeIndex;
-
-        return React.cloneElement<TabProps & InjectTabDataAttrs>(children, {
-          key: index,
-          ref: tabRef,
-          tabIndex: selected ? 0 : -1,
-          onClick: () => actionTabChange(index),
-          'aria-selected': selected,
-          'aria-controls': generatePanelId(index, id),
-          id: generateTabId(index, id),
-          'data-state': selected ? 'active' : 'inactive',
-        });
-      })}
-    </div>
+      tabIndex={selected ? 0 : -1}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-selected={selected}
+      aria-controls={generatePanelId(index, id)}
+      id={generateTabId(index, id)}
+      data-state={selected ? 'active' : 'inactive'}
+      type="button"
+      role="tab"
+      {...props}
+    />
   );
-});
+};
 
-TabList.displayName = 'TabList';
-
-// Panel
-// --------------------
-
-type PanelProps = React.ComponentPropsWithRef<'div'>;
-
-type PanelRef = HTMLDivElement;
-
-const Panel = React.forwardRef<PanelRef, PanelProps>((props, ref) => (
-  <div ref={ref} role="tabpanel" {...props} />
-));
-
-Panel.displayName = 'Panel';
+Tab.displayName = 'Tab';
 
 // PanelList
 // --------------------
@@ -168,26 +193,33 @@ type PanelListProps = React.ComponentPropsWithRef<'div'> & {
 
 type PanelListRef = HTMLDivElement;
 
+type PanelContextValue = {
+  index: number;
+};
+
+const [PanelContext, usePanelContext] = createContext<PanelContextValue>({
+  hookName: 'usePanelContext',
+  providerName: 'Tabs.PanelList',
+});
+
 const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
   (props, ref) => {
     const { children, ...propsExcludeChildren } = props;
 
-    const { id, activeIndex } = useTabsContext();
-
-    if (activeIndex === undefined) return null;
+    const { activeIndex } = useTabsContext();
 
     return (
       <div {...propsExcludeChildren} ref={ref}>
         {React.Children.map(children, (children, index) => {
-          const selected = index === activeIndex;
+          const selected =
+            activeIndex === undefined ? false : index === activeIndex;
+
+          if (!selected) return null;
 
           return (
-            selected &&
-            React.cloneElement<PanelProps>(children, {
-              key: index,
-              'aria-labelledby': generateTabId(index, id),
-              id: generatePanelId(index, id),
-            })
+            <PanelContext.Provider key={index} value={{ index }}>
+              {children}
+            </PanelContext.Provider>
           );
         })}
       </div>
@@ -196,6 +228,31 @@ const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
 );
 
 PanelList.displayName = 'PanelList';
+
+// Panel
+// --------------------
+
+type PanelProps = React.ComponentPropsWithRef<'div'>;
+
+type PanelRef = HTMLDivElement;
+
+const Panel = React.forwardRef<PanelRef, PanelProps>((props, ref) => {
+  const { id } = useTabsContext();
+
+  const { index } = usePanelContext();
+
+  return (
+    <div
+      ref={ref}
+      role="tabpanel"
+      aria-labelledby={generateTabId(index, id)}
+      id={generatePanelId(index, id)}
+      {...props}
+    />
+  );
+});
+
+Panel.displayName = 'Panel';
 
 // export
 // --------------------
