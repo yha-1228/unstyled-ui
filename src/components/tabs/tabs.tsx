@@ -1,5 +1,5 @@
 import React, { useId, useRef, useState } from 'react';
-import { useCallbackRef } from '../../hooks/use-callback-ref';
+import { useNode } from '../../hooks/use-node';
 import { createContext } from '../../utils/react';
 
 // Utils
@@ -100,7 +100,7 @@ function TabList(props: TabListProps) {
   const { children, ...restTabListProps } = props;
   const { orientation } = useTabsContext();
   const lastTabElementIndex = React.Children.count(children) - 1;
-  const [ref, tabElement] = useCallbackRef<HTMLDivElement>();
+  const [ref, tabElement] = useNode<HTMLDivElement>();
   const firstTabElement = tabElement?.firstElementChild;
   const lastTabElement = tabElement?.lastElementChild;
 
