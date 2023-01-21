@@ -14,7 +14,7 @@ const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 
 type TabsProviderProps = {
   defaultIndex?: number;
-  onIndexChange?: (selectedIndex: number) => void;
+  onTabChange?: (selectedIndex: number) => void;
 };
 
 type TabsState = {
@@ -35,7 +35,7 @@ const INITIAL_TAB_INDEX = 0;
 type DivProps = React.ComponentPropsWithoutRef<'div'>;
 
 function TabsRoot(props: DivProps & TabsProviderProps) {
-  const { defaultIndex, onIndexChange, ...divProps } = props;
+  const { defaultIndex, onTabChange, ...divProps } = props;
 
   const id = useId();
 
@@ -51,7 +51,7 @@ function TabsRoot(props: DivProps & TabsProviderProps) {
 
     // ---
     defaultIndex,
-    onIndexChange,
+    onTabChange: onTabChange,
   };
 
   return (
@@ -118,7 +118,7 @@ TabList.displayName = 'TabList';
 type TabProps = React.ComponentPropsWithRef<'button'>;
 
 const Tab: React.FC<TabProps> = (props) => {
-  const { activeIndex, setActiveIndex, onIndexChange, id } = useTabsContext();
+  const { activeIndex, setActiveIndex, onTabChange, id } = useTabsContext();
 
   const { index, lastIndex, firstElement, lastElement } = useTabContext();
 
@@ -128,7 +128,7 @@ const Tab: React.FC<TabProps> = (props) => {
 
   const actionTabChange = (selectedIndex: number) => {
     setActiveIndex(selectedIndex);
-    onIndexChange?.(selectedIndex);
+    onTabChange?.(selectedIndex);
   };
 
   const handleClick = () => {
