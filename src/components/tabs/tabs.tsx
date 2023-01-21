@@ -9,7 +9,9 @@ const generateTabId = (index: number, id: string) => `tab-${index}-${id}`;
 
 const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 
-const getFocusKey = (orientation: React.AriaAttributes['aria-orientation']) => {
+const getFocusKeys = (
+  orientation: React.AriaAttributes['aria-orientation']
+) => {
   switch (orientation) {
     case 'horizontal':
       return { prev: 'ArrowLeft', next: 'ArrowRight' };
@@ -143,7 +145,7 @@ type TabProps = React.ComponentPropsWithRef<'button'>;
 const Tab: React.FC<TabProps> = (props) => {
   const { activeIndex, setActiveIndex, onTabChange, id, orientation } =
     useTabsContext();
-  const focusKey = getFocusKey(orientation);
+  const focusKeys = getFocusKeys(orientation);
 
   const { index, lastIndex, firstElement, lastElement } = useTabContext();
 
@@ -162,7 +164,7 @@ const Tab: React.FC<TabProps> = (props) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === focusKey.next) {
+    if (e.key === focusKeys.next) {
       const nextTabElement = ref.current?.nextElementSibling;
 
       if (nextTabElement instanceof HTMLButtonElement) {
@@ -174,7 +176,7 @@ const Tab: React.FC<TabProps> = (props) => {
       }
     }
 
-    if (e.key === focusKey.prev) {
+    if (e.key === focusKeys.prev) {
       const prevTabElement = ref.current?.previousElementSibling;
 
       if (prevTabElement instanceof HTMLButtonElement) {
