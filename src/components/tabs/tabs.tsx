@@ -89,8 +89,8 @@ type TabListProps = Omit<React.ComponentPropsWithRef<'div'>, 'children'> & {
 type TabContextValue = {
   index: number;
   lastIndex: number;
-  firstElement: HTMLButtonElement;
-  lastElement: HTMLButtonElement;
+  firstTabElement: HTMLButtonElement;
+  lastTabElement: HTMLButtonElement;
 };
 
 const [TabContext, useTabContext] = createContext<TabContextValue>({
@@ -123,8 +123,8 @@ const TabList: React.FC<TabListProps> = (props) => {
             value={{
               index,
               lastIndex: lastTabElementIndex,
-              firstElement: firstTabElement as HTMLButtonElement,
-              lastElement: lastTabElement as HTMLButtonElement,
+              firstTabElement: firstTabElement as HTMLButtonElement,
+              lastTabElement: lastTabElement as HTMLButtonElement,
             }}
           >
             {children}
@@ -147,7 +147,7 @@ const Tab: React.FC<TabProps> = (props) => {
     useTabsContext();
   const focusKeys = getFocusKeys(orientation);
 
-  const { index, lastIndex, firstElement, lastElement } = useTabContext();
+  const { index, lastIndex, firstTabElement, lastTabElement } = useTabContext();
 
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -171,7 +171,7 @@ const Tab: React.FC<TabProps> = (props) => {
         nextTabElement.focus();
         actionTabChange(index + 1);
       } else {
-        firstElement.focus();
+        firstTabElement.focus();
         actionTabChange(0);
       }
     }
@@ -183,7 +183,7 @@ const Tab: React.FC<TabProps> = (props) => {
         prevTabElement.focus();
         actionTabChange(index - 1);
       } else {
-        lastElement.focus();
+        lastTabElement.focus();
         actionTabChange(lastIndex);
       }
     }
