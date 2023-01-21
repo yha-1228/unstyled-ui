@@ -30,28 +30,32 @@ const [TabsContext, useTabsContext] = createContext<TabsContextValue>({
   providerName: 'Tabs.Root',
 });
 
-type DivProps = React.ComponentPropsWithoutRef<'div'>;
+type DivProps = React.ComponentPropsWithRef<'div'>;
 
-function TabsRoot(props: DivProps & TabsProviderProps) {
-  const { defaultIndex = 0, onTabChange, ...divProps } = props;
+const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
+  (props, ref) => {
+    const { defaultIndex = 0, onTabChange, ...divProps } = props;
 
-  const id = useId();
+    const id = useId();
 
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
+    const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
-  const tabsContextValue: TabsContextValue = {
-    id,
-    activeIndex,
-    setActiveIndex,
-    onTabChange,
-  };
+    const tabsContextValue: TabsContextValue = {
+      id,
+      activeIndex,
+      setActiveIndex,
+      onTabChange,
+    };
 
-  return (
-    <TabsContext.Provider value={tabsContextValue}>
-      <div {...divProps} />
-    </TabsContext.Provider>
-  );
-}
+    return (
+      <TabsContext.Provider value={tabsContextValue}>
+        <div {...divProps} ref={ref} />
+      </TabsContext.Provider>
+    );
+  }
+);
+
+TabsRoot.displayName = 'TabsRoot';
 
 // TabList
 // --------------------
