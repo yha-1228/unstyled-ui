@@ -148,19 +148,18 @@ const Tab: React.FC<TabProps> = (props) => {
   const focusKeys = getFocusKeys(orientation);
 
   const { index, lastIndex, firstTabElement, lastTabElement } = useTabContext();
+  const selected = index === activeIndex;
 
   const ref = useRef<HTMLButtonElement>(null);
 
-  const selected = index === activeIndex;
-
-  const actionTabChange = (selectedIndex: number) => {
+  const actionChange = (selectedIndex: number, focusEl?: HTMLButtonElement) => {
     setActiveIndex(selectedIndex);
     onTabChange?.(selectedIndex);
+    focusEl?.focus();
   };
 
   const handleClick = () => {
-    ref.current?.focus();
-    actionTabChange(index);
+    actionChange(index);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -168,11 +167,9 @@ const Tab: React.FC<TabProps> = (props) => {
       const nextTabElement = ref.current?.nextElementSibling;
 
       if (nextTabElement instanceof HTMLButtonElement) {
-        nextTabElement.focus();
-        actionTabChange(index + 1);
+        actionChange(index + 1, nextTabElement);
       } else {
-        firstTabElement.focus();
-        actionTabChange(0);
+        actionChange(0, firstTabElement);
       }
     }
 
@@ -180,12 +177,18 @@ const Tab: React.FC<TabProps> = (props) => {
       const prevTabElement = ref.current?.previousElementSibling;
 
       if (prevTabElement instanceof HTMLButtonElement) {
-        prevTabElement.focus();
-        actionTabChange(index - 1);
+        actionChange(index - 1, prevTabElement);
       } else {
-        lastTabElement.focus();
-        actionTabChange(lastIndex);
+        actionChange(lastIndex, lastTabElement);
       }
+    }
+
+    if (e.key === 'Home') {
+      actionChange(0, firstTabElement);
+    }
+
+    if (e.key === 'End') {
+      actionChange(lastIndex, lastTabElement);
     }
   };
 
