@@ -23,35 +23,27 @@ type TabsState = {
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
-type TabsContextValue = TabsState & TabsProviderProps;
+type TabsContextValue = TabsState & Omit<TabsProviderProps, 'defaultIndex'>;
 
 const [TabsContext, useTabsContext] = createContext<TabsContextValue>({
   hookName: 'useTabsContext',
   providerName: 'Tabs.Root',
 });
 
-const INITIAL_TAB_INDEX = 0;
-
 type DivProps = React.ComponentPropsWithoutRef<'div'>;
 
 function TabsRoot(props: DivProps & TabsProviderProps) {
-  const { defaultIndex, onTabChange, ...divProps } = props;
+  const { defaultIndex = 0, onTabChange, ...divProps } = props;
 
   const id = useId();
 
-  const [activeIndex, setActiveIndex] = useState(() => {
-    if (props.defaultIndex) return props.defaultIndex;
-    return INITIAL_TAB_INDEX;
-  });
+  const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
   const tabsContextValue: TabsContextValue = {
     id,
     activeIndex,
     setActiveIndex,
-
-    // ---
-    defaultIndex,
-    onTabChange: onTabChange,
+    onTabChange,
   };
 
   return (
