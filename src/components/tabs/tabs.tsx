@@ -14,14 +14,13 @@ const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 
 type TabsProviderProps = {
   defaultIndex?: number;
-  defaultIsNotSelected?: boolean;
   onIndexChange?: (selectedIndex: number) => void;
 };
 
 type TabsState = {
   id: string;
-  activeIndex: number | undefined;
-  setActiveIndex: React.Dispatch<React.SetStateAction<number | undefined>>;
+  activeIndex: number;
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
 type TabsContextValue = TabsState & TabsProviderProps;
@@ -36,13 +35,11 @@ const INITIAL_TAB_INDEX = 0;
 type DivProps = React.ComponentPropsWithoutRef<'div'>;
 
 function TabsRoot(props: DivProps & TabsProviderProps) {
-  const { defaultIndex, defaultIsNotSelected, onIndexChange, ...divProps } =
-    props;
+  const { defaultIndex, onIndexChange, ...divProps } = props;
 
   const id = useId();
 
   const [activeIndex, setActiveIndex] = useState(() => {
-    if (props.defaultIsNotSelected) return undefined;
     if (props.defaultIndex) return props.defaultIndex;
     return INITIAL_TAB_INDEX;
   });
@@ -54,7 +51,6 @@ function TabsRoot(props: DivProps & TabsProviderProps) {
 
     // ---
     defaultIndex,
-    defaultIsNotSelected,
     onIndexChange,
   };
 
@@ -128,7 +124,7 @@ const Tab: React.FC<TabProps> = (props) => {
 
   const ref = useRef<HTMLButtonElement>(null);
 
-  const selected = activeIndex === undefined ? false : index === activeIndex;
+  const selected = index === activeIndex;
 
   const actionTabChange = (selectedIndex: number) => {
     setActiveIndex(selectedIndex);
@@ -212,8 +208,7 @@ const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
     return (
       <div {...propsExcludeChildren} ref={ref}>
         {React.Children.map(children, (children, index) => {
-          const selected =
-            activeIndex === undefined ? false : index === activeIndex;
+          const selected = index === activeIndex;
 
           if (!selected) return null;
 
