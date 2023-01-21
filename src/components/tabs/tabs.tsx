@@ -82,7 +82,12 @@ const TabList: React.FC<TabListProps> = (props) => {
   const lastTabElement = tabElement?.lastElementChild;
 
   return (
-    <div role="tablist" {...propsExcludeChildren} ref={ref}>
+    <div
+      role="tablist"
+      aria-orientation="horizontal"
+      {...propsExcludeChildren}
+      ref={ref}
+    >
       {React.Children.map(children, (children, index) => {
         return (
           <TabContext.Provider
