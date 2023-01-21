@@ -56,21 +56,19 @@ const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
       onTabChange,
       ...divProps
     } = props;
-
     const id = useId();
-
     const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
-    const tabsContextValue: TabsContextValue = {
-      id,
-      activeIndex,
-      setActiveIndex,
-      orientation,
-      onTabChange,
-    };
-
     return (
-      <TabsContext.Provider value={tabsContextValue}>
+      <TabsContext.Provider
+        value={{
+          id,
+          activeIndex,
+          setActiveIndex,
+          orientation,
+          onTabChange,
+        }}
+      >
         <div {...divProps} ref={ref} />
       </TabsContext.Provider>
     );
@@ -99,13 +97,10 @@ const [TabContext, useTabContext] = createContext<TabContextValue>({
 });
 
 function TabList(props: TabListProps) {
+  const { children, ...restTabListProps } = props;
   const { orientation } = useTabsContext();
-
-  const { children, ...propsExcludeChildren } = props;
   const lastTabElementIndex = React.Children.count(children) - 1;
-
   const [ref, tabElement] = useCallbackRef<HTMLDivElement>();
-
   const firstTabElement = tabElement?.firstElementChild;
   const lastTabElement = tabElement?.lastElementChild;
 
@@ -113,7 +108,7 @@ function TabList(props: TabListProps) {
     <div
       role="tablist"
       aria-orientation={orientation}
-      {...propsExcludeChildren}
+      {...restTabListProps}
       ref={ref}
     >
       {React.Children.map(children, (children, index) => {
@@ -146,10 +141,8 @@ function Tab(props: TabProps) {
   const { activeIndex, setActiveIndex, onTabChange, id, orientation } =
     useTabsContext();
   const focusKeys = getFocusKeys(orientation);
-
   const { index, lastIndex, firstTabElement, lastTabElement } = useTabContext();
   const selected = index === activeIndex;
-
   const ref = useRef<HTMLButtonElement>(null);
 
   const actionChange = (selectedIndex: number, focusEl?: HTMLButtonElement) => {
@@ -212,11 +205,9 @@ function Tab(props: TabProps) {
 // PanelList
 // --------------------
 
-type PanelListProps = React.ComponentPropsWithRef<'div'> & {
+type PanelListProps = {
   children: React.ReactElement[] | React.ReactElement;
 };
-
-type PanelListRef = HTMLDivElement;
 
 type PanelContextValue = {
   index: number;
@@ -227,29 +218,19 @@ const [PanelContext, usePanelContext] = createContext<PanelContextValue>({
   providerName: 'Tabs.PanelList',
 });
 
-const PanelList = React.forwardRef<PanelListRef, PanelListProps>(
-  (props, ref) => {
-    const { children, ...propsExcludeChildren } = props;
+function PanelList(props: PanelListProps) {
+  const { children } = props;
 
-    const { activeIndex } = useTabsContext();
-
-    return (
-      <div {...propsExcludeChildren} ref={ref}>
-        {React.Children.map(children, (children, index) => {
-          const selected = index === activeIndex;
-
-          if (!selected) return null;
-
-          return (
-            <PanelContext.Provider key={index} value={{ index }}>
-              {children}
-            </PanelContext.Provider>
-          );
-        })}
-      </div>
-    );
-  }
-);
+  return (
+    <>
+      {React.Children.map(children, (children, index) => (
+        <PanelContext.Provider key={index} value={{ index }}>
+          {children}
+        </PanelContext.Provider>
+      ))}
+    </>
+  );
+}
 
 PanelList.displayName = 'PanelList';
 
@@ -261,9 +242,10 @@ type PanelProps = React.ComponentPropsWithRef<'div'>;
 type PanelRef = HTMLDivElement;
 
 const Panel = React.forwardRef<PanelRef, PanelProps>((props, ref) => {
-  const { id } = useTabsContext();
-
+  const { children, ...restDivProps } = props;
+  const { id, activeIndex } = useTabsContext();
   const { index } = usePanelContext();
+  const selected = index === activeIndex;
 
   return (
     <div
@@ -271,8 +253,10 @@ const Panel = React.forwardRef<PanelRef, PanelProps>((props, ref) => {
       role="tabpanel"
       aria-labelledby={generateTabId(index, id)}
       id={generatePanelId(index, id)}
-      {...props}
-    />
+      {...restDivProps}
+    >
+      {selected && children}
+    </div>
   );
 });
 
