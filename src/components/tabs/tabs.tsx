@@ -9,11 +9,25 @@ const generateTabId = (index: number, id: string) => `tab-${index}-${id}`;
 
 const generatePanelId = (index: number, id: string) => `panel-${index}-${id}`;
 
+const getFocusKey = (orientation: React.AriaAttributes['aria-orientation']) => {
+  switch (orientation) {
+    case 'horizontal':
+      return { prev: 'ArrowLeft', next: 'ArrowRight' };
+
+    case 'vertical':
+      return { prev: 'ArrowUp', next: 'ArrowDown' };
+
+    default:
+      throw new Error('Undefined value');
+  }
+};
+
 // TabsRoot
 // --------------------
 
 type TabsProviderProps = {
   defaultIndex?: number;
+  orientation?: React.AriaAttributes['aria-orientation'];
   onTabChange?: (selectedIndex: number) => void;
 };
 
@@ -34,7 +48,12 @@ type DivProps = React.ComponentPropsWithRef<'div'>;
 
 const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
   (props, ref) => {
-    const { defaultIndex = 0, onTabChange, ...divProps } = props;
+    const {
+      defaultIndex = 0,
+      orientation = 'horizontal',
+      onTabChange,
+      ...divProps
+    } = props;
 
     const id = useId();
 
@@ -44,6 +63,7 @@ const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
       id,
       activeIndex,
       setActiveIndex,
+      orientation,
       onTabChange,
     };
 
@@ -77,6 +97,8 @@ const [TabContext, useTabContext] = createContext<TabContextValue>({
 });
 
 const TabList: React.FC<TabListProps> = (props) => {
+  const { orientation } = useTabsContext();
+
   const { children, ...propsExcludeChildren } = props;
   const lastTabElementIndex = React.Children.count(children) - 1;
 
@@ -88,7 +110,7 @@ const TabList: React.FC<TabListProps> = (props) => {
   return (
     <div
       role="tablist"
-      aria-orientation="horizontal"
+      aria-orientation={orientation}
       {...propsExcludeChildren}
       ref={ref}
     >
@@ -119,7 +141,9 @@ TabList.displayName = 'TabList';
 type TabProps = React.ComponentPropsWithRef<'button'>;
 
 const Tab: React.FC<TabProps> = (props) => {
-  const { activeIndex, setActiveIndex, onTabChange, id } = useTabsContext();
+  const { activeIndex, setActiveIndex, onTabChange, id, orientation } =
+    useTabsContext();
+  const focusKey = getFocusKey(orientation);
 
   const { index, lastIndex, firstElement, lastElement } = useTabContext();
 
@@ -138,7 +162,7 @@ const Tab: React.FC<TabProps> = (props) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === 'ArrowRight') {
+    if (e.key === focusKey.next) {
       const nextTabElement = ref.current?.nextElementSibling;
 
       if (nextTabElement instanceof HTMLButtonElement) {
@@ -150,7 +174,7 @@ const Tab: React.FC<TabProps> = (props) => {
       }
     }
 
-    if (e.key === 'ArrowLeft') {
+    if (e.key === focusKey.prev) {
       const prevTabElement = ref.current?.previousElementSibling;
 
       if (prevTabElement instanceof HTMLButtonElement) {
