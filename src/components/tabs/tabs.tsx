@@ -98,7 +98,7 @@ const [TabContext, useTabContext] = createContext<TabContextValue>({
   providerName: 'Tabs.TabList',
 });
 
-const TabList: React.FC<TabListProps> = (props) => {
+function TabList(props: TabListProps) {
   const { orientation } = useTabsContext();
 
   const { children, ...propsExcludeChildren } = props;
@@ -133,7 +133,7 @@ const TabList: React.FC<TabListProps> = (props) => {
       })}
     </div>
   );
-};
+}
 
 TabList.displayName = 'TabList';
 
@@ -142,7 +142,7 @@ TabList.displayName = 'TabList';
 
 type TabProps = React.ComponentPropsWithRef<'button'>;
 
-const Tab: React.FC<TabProps> = (props) => {
+function Tab(props: TabProps) {
   const { activeIndex, setActiveIndex, onTabChange, id, orientation } =
     useTabsContext();
   const focusKeys = getFocusKeys(orientation);
@@ -207,9 +207,7 @@ const Tab: React.FC<TabProps> = (props) => {
       {...props}
     />
   );
-};
-
-Tab.displayName = 'Tab';
+}
 
 // PanelList
 // --------------------
