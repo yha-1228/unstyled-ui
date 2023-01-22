@@ -41,6 +41,10 @@ type TabsProviderProps = {
    * @default "horizontal"
    */
   orientation?: React.AriaAttributes['aria-orientation'];
+  /**
+   * @default "automatic"
+   */
+  tabChangeMode?: 'automatic' | 'manual';
   onTabChange?: (selectedIndex: number) => void;
 };
 
@@ -65,6 +69,7 @@ const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
       defaultIndex = 0,
       activeIndex: activeIndexProp,
       orientation = 'horizontal',
+      tabChangeMode = 'automatic',
       onTabChange,
       ...divProps
     } = props;
@@ -81,6 +86,7 @@ const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
           activeIndex,
           setActiveIndex,
           orientation,
+          tabChangeMode,
           onTabChange,
         }}
       >
@@ -153,21 +159,26 @@ TabList.displayName = 'TabList';
 type TabProps = React.ComponentPropsWithRef<'button'>;
 
 function Tab(props: TabProps) {
-  const { activeIndex, setActiveIndex, onTabChange, id, orientation } =
-    useTabsContext();
+  const {
+    activeIndex,
+    setActiveIndex,
+    onTabChange,
+    id,
+    orientation,
+    tabChangeMode,
+  } = useTabsContext();
   const focusKeys = getFocusKeys(orientation);
   const { index, lastIndex, firstTabElement, lastTabElement } = useTabContext();
   const selected = index === activeIndex;
   const ref = useRef<HTMLButtonElement>(null);
 
-  const actionChange = (selectedIndex: number, focusEl?: HTMLButtonElement) => {
+  const actionTabChange = (selectedIndex: number) => {
     setActiveIndex(selectedIndex);
     onTabChange?.(selectedIndex);
-    focusEl?.focus();
   };
 
   const handleClick = () => {
-    actionChange(index);
+    actionTabChange(index);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -175,9 +186,11 @@ function Tab(props: TabProps) {
       const nextTabElement = ref.current?.nextElementSibling;
 
       if (nextTabElement instanceof HTMLButtonElement) {
-        actionChange(index + 1, nextTabElement);
+        tabChangeMode === 'automatic' && actionTabChange(index + 1);
+        nextTabElement.focus();
       } else {
-        actionChange(0, firstTabElement);
+        tabChangeMode === 'automatic' && actionTabChange(0);
+        firstTabElement.focus();
       }
     }
 
@@ -185,18 +198,26 @@ function Tab(props: TabProps) {
       const prevTabElement = ref.current?.previousElementSibling;
 
       if (prevTabElement instanceof HTMLButtonElement) {
-        actionChange(index - 1, prevTabElement);
+        tabChangeMode === 'automatic' && actionTabChange(index - 1);
+        prevTabElement.focus();
       } else {
-        actionChange(lastIndex, lastTabElement);
+        tabChangeMode === 'automatic' && actionTabChange(lastIndex);
+        lastTabElement.focus();
       }
     }
 
     if (e.key === 'Home') {
-      actionChange(0, firstTabElement);
+      tabChangeMode === 'automatic' && actionTabChange(0);
+      firstTabElement.focus();
     }
 
     if (e.key === 'End') {
-      actionChange(lastIndex, lastTabElement);
+      tabChangeMode === 'automatic' && actionTabChange(lastIndex);
+      lastTabElement.focus();
+    }
+
+    if (e.key === 'Enter') {
+      actionTabChange(index);
     }
   };
 
