@@ -1,4 +1,5 @@
-import React, { useId, useRef, useState } from 'react';
+import React, { useId, useRef } from 'react';
+import { useControlableState } from '../../hooks/use-controlable-state';
 import { useNode } from '../../hooks/use-node';
 import { createContext } from '../../utils/react';
 
@@ -33,7 +34,11 @@ type TabsProviderProps = {
    */
   defaultIndex?: number;
   /**
-   * @default horizontal
+   * If control
+   */
+  activeIndex?: number;
+  /**
+   * @default "horizontal"
    */
   orientation?: React.AriaAttributes['aria-orientation'];
   onTabChange?: (selectedIndex: number) => void;
@@ -58,12 +63,16 @@ const TabsRoot = React.forwardRef<HTMLDivElement, DivProps & TabsProviderProps>(
   (props, ref) => {
     const {
       defaultIndex = 0,
+      activeIndex: activeIndexProp,
       orientation = 'horizontal',
       onTabChange,
       ...divProps
     } = props;
     const id = useId();
-    const [activeIndex, setActiveIndex] = useState(defaultIndex);
+    const [activeIndex, setActiveIndex] = useControlableState(
+      defaultIndex,
+      activeIndexProp
+    );
 
     return (
       <TabsContext.Provider
