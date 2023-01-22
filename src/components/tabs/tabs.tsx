@@ -28,7 +28,13 @@ const getFocusKeys = (
 // --------------------
 
 type TabsProviderProps = {
+  /**
+   * @default 0
+   */
   defaultIndex?: number;
+  /**
+   * @default horizontal
+   */
   orientation?: React.AriaAttributes['aria-orientation'];
   onTabChange?: (selectedIndex: number) => void;
 };
