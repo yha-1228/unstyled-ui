@@ -173,8 +173,10 @@ function Tab(props: TabProps) {
   const ref = useRef<HTMLButtonElement>(null);
 
   const actionTabChange = (selectedIndex: number) => {
-    setActiveIndex(selectedIndex);
-    onTabChange?.(selectedIndex);
+    if (selectedIndex !== activeIndex) {
+      setActiveIndex(selectedIndex);
+      onTabChange?.(selectedIndex);
+    }
   };
 
   const handleClick = () => {
